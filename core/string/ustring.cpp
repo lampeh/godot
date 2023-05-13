@@ -2239,8 +2239,6 @@ static int64_t built_in_strtoi(const C *p_str, int p_len = -1) {
 			integer += c - '0';
 		} else if (c == '-' && integer == 0) {
 			sign = -sign;
-		} else if (c != ' ') {
-			break;
 		}
 	}
 
