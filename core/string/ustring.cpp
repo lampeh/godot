@@ -2242,7 +2242,8 @@ int64_t String::to_int() const {
 	return integer * sign;
 }
 
-int64_t String::to_int(const char *p_str, int p_len) {
+template <class C>
+static int64_t built_in_strtoi(const C *p_str, int p_len = -1) {
 	int to = 0;
 	if (p_len >= 0) {
 		to = p_len;
@@ -2256,13 +2257,12 @@ int64_t String::to_int(const char *p_str, int p_len) {
 	int64_t sign = 1;
 
 	for (int i = 0; i < to; i++) {
-		char c = p_str[i];
+		char32_t c = (char32_t)p_str[i];
 		if (is_digit(c)) {
 			bool overflow = (integer > INT64_MAX / 10) || (integer == INT64_MAX / 10 && ((sign == 1 && c > '7') || (sign == -1 && c > '8')));
 			ERR_FAIL_COND_V_MSG(overflow, sign == 1 ? INT64_MAX : INT64_MIN, "Cannot represent " + String(p_str).substr(0, to) + " as a 64-bit signed integer, since the value is " + (sign == 1 ? "too large." : "too small."));
 			integer *= 10;
 			integer += c - '0';
-
 		} else if (c == '-' && integer == 0) {
 			sign = -sign;
 		} else if (c != ' ') {
@@ -2271,68 +2271,18 @@ int64_t String::to_int(const char *p_str, int p_len) {
 	}
 
 	return integer * sign;
+}
+
+int64_t String::to_int(const char *p_str, int p_len) {
+	return built_in_strtoi<char>(p_str, p_len);
 }
 
 int64_t String::to_int(const wchar_t *p_str, int p_len) {
-	int to = 0;
-	if (p_len >= 0) {
-		to = p_len;
-	} else {
-		while (p_str[to] != 0 && p_str[to] != '.') {
-			to++;
-		}
-	}
-
-	int64_t integer = 0;
-	int64_t sign = 1;
-
-	for (int i = 0; i < to; i++) {
-		wchar_t c = p_str[i];
-		if (is_digit(c)) {
-			bool overflow = (integer > INT64_MAX / 10) || (integer == INT64_MAX / 10 && ((sign == 1 && c > '7') || (sign == -1 && c > '8')));
-			ERR_FAIL_COND_V_MSG(overflow, sign == 1 ? INT64_MAX : INT64_MIN, "Cannot represent " + String(p_str).substr(0, to) + " as a 64-bit signed integer, since the value is " + (sign == 1 ? "too large." : "too small."));
-			integer *= 10;
-			integer += c - '0';
-
-		} else if (c == '-' && integer == 0) {
-			sign = -sign;
-		} else if (c != ' ') {
-			break;
-		}
-	}
-
-	return integer * sign;
+	return built_in_strtoi<wchar_t>(p_str, p_len);
 }
 
 int64_t String::to_int(const char32_t *p_str, int p_len) {
-	int to = 0;
-	if (p_len >= 0) {
-		to = p_len;
-	} else {
-		while (p_str[to] != 0 && p_str[to] != '.') {
-			to++;
-		}
-	}
-
-	int64_t integer = 0;
-	int64_t sign = 1;
-
-	for (int i = 0; i < to; i++) {
-		char32_t c = p_str[i];
-		if (is_digit(c)) {
-			bool overflow = (integer > INT64_MAX / 10) || (integer == INT64_MAX / 10 && ((sign == 1 && c > '7') || (sign == -1 && c > '8')));
-			ERR_FAIL_COND_V_MSG(overflow, sign == 1 ? INT64_MAX : INT64_MIN, "Cannot represent " + String(p_str).substr(0, to) + " as a 64-bit signed integer, since the value is " + (sign == 1 ? "too large." : "too small."));
-			integer *= 10;
-			integer += c - '0';
-
-		} else if (c == '-' && integer == 0) {
-			sign = -sign;
-		} else if (c != ' ') {
-			break;
-		}
-	}
-
-	return integer * sign;
+	return built_in_strtoi<char32_t>(p_str, p_len);
 }
 
 bool String::is_numeric() const {
