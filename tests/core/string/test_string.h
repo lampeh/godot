@@ -548,20 +548,23 @@ TEST_CASE("[String] Splitting") {
 		CHECK(ABS(f_arr[i] - slices_d[i]) <= 0.00001);
 	}
 
-	s = "1;2 4";
-	const int slices_i[3] = { 1, 2, 4 };
+	s = "1;2 4; -x1y2z3.4.5;Hello!";
+	const int slices_i[4] = { 1, 24, -123, 0 };
 
 	Vector<int> ii;
 	ii = s.split_ints(";");
-	CHECK(ii.size() == 2);
+	CHECK(ii.size() == 4);
 	for (int i = 0; i < ii.size(); i++) {
 		CHECK(ii[i] == slices_i[i]);
 	}
 
+	s = "1;2 4";
+	const int slices_i2[3] = { 1, 2, 4 };
+
 	ii = s.split_ints_mk(keys);
 	CHECK(ii.size() == 3);
 	for (int i = 0; i < ii.size(); i++) {
-		CHECK(ii[i] == slices_i[i]);
+		CHECK(ii[i] == slices_i2[i]);
 	}
 }
 
