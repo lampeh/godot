@@ -2224,7 +2224,7 @@ static int64_t built_in_strtoi(const C *p_str, int p_len = -1) {
 	const C *str = p_str;
 	const C *limit = &p_str[p_len];
 
-	while (*str && str != limit) {
+	while (str != limit && *str != 0 && *str != '.') {
 		char32_t c = (char32_t)*(str++);
 		if (is_digit(c)) {
 			if ((integer > INT64_MAX / 10) || (integer == INT64_MAX / 10 && ((sign == 1 && c > '7') || (sign == -1 && c > '8')))) {
@@ -2238,8 +2238,6 @@ static int64_t built_in_strtoi(const C *p_str, int p_len = -1) {
 			integer += c - '0';
 		} else if (c == '-' && integer == 0) {
 			sign = -sign;
-		} else if (c == '.') {
-			break;
 		}
 	}
 
