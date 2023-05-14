@@ -2228,11 +2228,11 @@ static int64_t built_in_strtoi(const C *p_str, int p_len = -1) {
 		char32_t c = (char32_t)*(str++);
 		if (is_digit(c)) {
 			if ((integer > INT64_MAX / 10) || (integer == INT64_MAX / 10 && ((sign == 1 && c > '7') || (sign == -1 && c > '8')))) {
-				int to = 0;
-				while ((p_len < 0 || to < p_len) && p_str[to] != 0 && p_str[to] != '.') {
-					to++;
+				str = p_str;
+				while (str != limit && *str != 0 && *str != '.') {
+					str++;
 				}
-				ERR_FAIL_V_MSG(sign == 1 ? INT64_MAX : INT64_MIN, "Cannot represent " + String(p_str).substr(0, to) + " as a 64-bit signed integer, since the value is " + (sign == 1 ? "too large." : "too small."));
+				ERR_FAIL_V_MSG(sign == 1 ? INT64_MAX : INT64_MIN, "Cannot represent " + String(p_str).substr(0, (str-p_str)) + " as a 64-bit signed integer, since the value is " + (sign == 1 ? "too large." : "too small."));
 			}
 			integer *= 10;
 			integer += c - '0';
