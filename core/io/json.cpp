@@ -336,9 +336,12 @@ Error JSON::_get_token(const char32_t *p_str, int &index, int p_len, Token &r_to
 					//a number
 					const char32_t *rptr;
 					double number = String::to_float(&p_str[index], &rptr);
-					index += (rptr - &p_str[index]);
 					r_token.type = TK_NUMBER;
 					r_token.value = number;
+					if (!memchr(&p_str[index], '.', (rptr - &p_str[index]) * sizeof(char32_t))) {
+						r_token.value = String::to_int(&p_str[index], (rptr - &p_str[index]));
+					}
+					index += (rptr - &p_str[index]);
 					return OK;
 
 				} else if (is_ascii_char(p_str[index])) {
